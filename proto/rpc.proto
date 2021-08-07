@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option go_package = "github.com/bartmika/growlog-server";
+
+package proto;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+
+service GrowLog {
+    rpc InsertRow (TimeSeriesDatum) returns (google.protobuf.Empty) {}
+    rpc InsertRows (stream TimeSeriesDatum) returns (google.protobuf.Empty) {}
+    rpc Select (Filter) returns (stream DataPoint) {}
+}
+
+message DataPoint {
+    double value = 3;
+    google.protobuf.Timestamp timestamp = 4;
+}
+
+message Label {
+    string name = 1;
+    string value = 2;
+}
+
+message TimeSeriesDatum {
+    string metric = 1;
+    repeated Label labels = 2;
+    double value = 3;
+    google.protobuf.Timestamp timestamp = 4;
+}
+
+message Filter {
+    string metric = 1;
+    repeated Label labels = 2;
+    google.protobuf.Timestamp start = 3;
+    google.protobuf.Timestamp end = 4;
+}
+
+message SelectResponse {
+    repeated DataPoint points = 1;
+}
