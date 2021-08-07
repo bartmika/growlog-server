@@ -13,6 +13,7 @@ import (
 
 type ControllerImpl struct {
 	tenantRepo models.TenantRepository
+	userRepo models.UserRepository
 	pb.GrowLogServer
 }
 

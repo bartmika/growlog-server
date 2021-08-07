@@ -51,6 +51,7 @@ func (s *Controller) RunMainRuntimeLoop() {
 	grpcServer := grpc.NewServer()
 
 	tenantRepo := repositories.NewTenantRepo(s.dbpool)
+	userRepo := repositories.NewUserRepo(s.dbpool)
 
 	// Save reference to our application state.
 	s.grpcServer = grpcServer
@@ -63,6 +64,7 @@ func (s *Controller) RunMainRuntimeLoop() {
 		// DEVELOPERS NOTE:
 		// We want to attach to every gRPC call the following variables...
 		tenantRepo: tenantRepo,
+		userRepo: userRepo,
 	})
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
