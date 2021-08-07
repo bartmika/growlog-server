@@ -1,5 +1,5 @@
 # growlog-server
-TODO
+**TODO**
 
 ## Installation
 
@@ -14,6 +14,7 @@ go install github.com/bartmika/growlog-server@latest
 To start the server, run the following command in your **terminal**:
 
 ```bash
+export GROWLOG_DATABASE_URL="postgres://golang:123passwordd@localhost:5432/growlog_db"
 $GOBIN/growlog-server serve
 ```
 
@@ -74,7 +75,7 @@ If you'd like to setup the project for development. Here are the installation st
 5. Run the following to generate our new gRPC interface. Please note in your development, if you make any changes to the gRPC service definition then you'll need to rerun the following:
 
     ```bash
-    protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/rpc.proto
+    protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/growlog.proto
     ```
 
 6. You are now ready to start the server and begin contributing!

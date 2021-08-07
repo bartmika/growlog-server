@@ -19,6 +19,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GrowLogClient interface {
+	Register(ctx context.Context, in *RegistrationInfo, opts ...grpc.CallOption) (*User, error)
+	Login(ctx context.Context, in *UserCredential, opts ...grpc.CallOption) (*User, error)
 	InsertRow(ctx context.Context, in *TimeSeriesDatum, opts ...grpc.CallOption) (*empty.Empty, error)
 	InsertRows(ctx context.Context, opts ...grpc.CallOption) (GrowLog_InsertRowsClient, error)
 	Select(ctx context.Context, in *Filter, opts ...grpc.CallOption) (GrowLog_SelectClient, error)
@@ -30,6 +32,24 @@ type growLogClient struct {
 
 func NewGrowLogClient(cc grpc.ClientConnInterface) GrowLogClient {
 	return &growLogClient{cc}
+}
+
+func (c *growLogClient) Register(ctx context.Context, in *RegistrationInfo, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/proto.GrowLog/Register", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *growLogClient) Login(ctx context.Context, in *UserCredential, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/proto.GrowLog/Login", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *growLogClient) InsertRow(ctx context.Context, in *TimeSeriesDatum, opts ...grpc.CallOption) (*empty.Empty, error) {
@@ -111,6 +131,8 @@ func (x *growLogSelectClient) Recv() (*DataPoint, error) {
 // All implementations must embed UnimplementedGrowLogServer
 // for forward compatibility
 type GrowLogServer interface {
+	Register(context.Context, *RegistrationInfo) (*User, error)
+	Login(context.Context, *UserCredential) (*User, error)
 	InsertRow(context.Context, *TimeSeriesDatum) (*empty.Empty, error)
 	InsertRows(GrowLog_InsertRowsServer) error
 	Select(*Filter, GrowLog_SelectServer) error
@@ -121,6 +143,12 @@ type GrowLogServer interface {
 type UnimplementedGrowLogServer struct {
 }
 
+func (UnimplementedGrowLogServer) Register(context.Context, *RegistrationInfo) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (UnimplementedGrowLogServer) Login(context.Context, *UserCredential) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
 func (UnimplementedGrowLogServer) InsertRow(context.Context, *TimeSeriesDatum) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertRow not implemented")
 }
@@ -141,6 +169,42 @@ type UnsafeGrowLogServer interface {
 
 func RegisterGrowLogServer(s grpc.ServiceRegistrar, srv GrowLogServer) {
 	s.RegisterService(&GrowLog_ServiceDesc, srv)
+}
+
+func _GrowLog_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegistrationInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GrowLogServer).Register(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.GrowLog/Register",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GrowLogServer).Register(ctx, req.(*RegistrationInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GrowLog_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserCredential)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GrowLogServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.GrowLog/Login",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GrowLogServer).Login(ctx, req.(*UserCredential))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _GrowLog_InsertRow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -216,6 +280,14 @@ var GrowLog_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GrowLogServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "Register",
+			Handler:    _GrowLog_Register_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _GrowLog_Login_Handler,
+		},
+		{
 			MethodName: "InsertRow",
 			Handler:    _GrowLog_InsertRow_Handler,
 		},
@@ -232,5 +304,5 @@ var GrowLog_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "proto/rpc.proto",
+	Metadata: "proto/growlog.proto",
 }

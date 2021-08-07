@@ -9,17 +9,19 @@ import (
 
 	"github.com/spf13/cobra"
 
-	server "github.com/bartmika/growlog-server/internal"
+	"github.com/bartmika/growlog-server/internal/controllers"
 	// "github.com/bartmika/growlog-server/utils"
 )
 
 var (
 	port                     int
+	databaseUrl              string
 )
 
 func init() {
 	// The following are optional and will have defaults placed when missing.
 	serveCmd.Flags().IntVarP(&port, "port", "p", 50051, "The port to run this server on")
+	serveCmd.Flags().StringVarP(&databaseUrl, "databaseUrl", "d", os.Getenv("GROWLOG_DATABASE_URL"), "The databaseUrl to run this server on")
 
 	// Make this sub-command part of our application.
 	rootCmd.AddCommand(serveCmd)
@@ -29,7 +31,7 @@ func doServe() {
 	// Convert the user inputted integer value to be a `time.Duration` type.
 
 	// Setup our server.
-	server := server.New(port)
+	server := controllers.New(port, databaseUrl)
 
 	// DEVELOPERS CODE:
 	// The following code will create an anonymous goroutine which will have a
@@ -53,7 +55,7 @@ func doServe() {
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Run the gRPC server",
-	Long:  `Run the gRPC server to allow other services to access the storage application`,
+	Long:  `Run the gRPC server to allow other services to access the application`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Defensive code. ...
 		// Do nothing for now...

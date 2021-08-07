@@ -9,10 +9,32 @@ import "google/protobuf/timestamp.proto";
 
 
 service GrowLog {
+    rpc Register(RegistrationInfo) returns (User) {}
+
+    rpc Login(UserCredential) returns (User) {}
+
     rpc InsertRow (TimeSeriesDatum) returns (google.protobuf.Empty) {}
+
     rpc InsertRows (stream TimeSeriesDatum) returns (google.protobuf.Empty) {}
+
     rpc Select (Filter) returns (stream DataPoint) {}
 }
+
+message RegistrationInfo {
+    string email = 1;
+    string password = 2;
+    string firstName = 3;
+    string lastName = 4;
+    string organizationName = 5;
+    string timezone = 6;
+}
+
+message UserCredential {
+    string email = 1;
+    string password = 2;
+}
+
+message User {}
 
 message DataPoint {
     double value = 3;
